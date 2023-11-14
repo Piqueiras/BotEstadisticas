@@ -46,8 +46,11 @@ def month_info(db:UserData, usr: str, year: int, month: int) -> str:
             res += f"{fecha}: {db[usr][fecha]}\n"
     return res
 
-def everyone_stats(db:UserData, usr: str):
+def user_stats(db:UserData,usr:str) -> str:
     res = ""
     for key, value in db[usr].items():
         res += f"{key}: {value}\n"
     return res.strip()
+
+def delete_user(db:UserData, usr:str) -> None:
+    db[usr] = {}
