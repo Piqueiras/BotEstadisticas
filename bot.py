@@ -6,16 +6,10 @@ import discord
 from discord import app_commands
 
 from keepalive import keepAlive
-import io
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
-
-
-
-
-
 
 
 @client.event
@@ -63,7 +57,7 @@ async def total(interaction: discord.Interaction):
 async def estadisticas(interaction: discord.Interaction):
     db : database.UserData = database.read_json_file(config.JSON_PATH)
     await interaction.response.send_message(
-        database.user_stats(interaction.user.name,interaction.user.name))
+        database.user_stats(db,interaction.user.name))
 
 
 @tree.command(name="mensualidad", description="Información detallada sobre tu estudio durante un mes")
@@ -79,10 +73,6 @@ async def top_study_time(ctx):
     db : database.UserData = database.read_json_file(config.JSON_PATH)
     graphics.generate_leaderboard(db,"leaderboard.png")
     await ctx.response.send_message(file=discord.File('leaderboard.png'))
-
-
-
-
 
 
 keepAlive()

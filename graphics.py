@@ -26,4 +26,4 @@ def generate_leaderboard(db:database.UserData,image_path:str):
 
     # Create a stacked bar plot using Plotly Express
     fig = px.bar(df, x='Username', y=list(df.columns[1:]), title='Monthly Study Hours Leaderboard', labels={'value': 'Study Hours'}, barmode='relative')
-    fig.write_image("imagen.png",width=1200)
+    fig.write_image(image_path,width=1200)
