@@ -22,10 +22,12 @@ async def on_ready():
         print(e)
 
 #FUNCION QUE MODIFICA
-@tree.command(name="estudio")
-@discord.app_commands.describe(horas="Cuantas horas has estudiado?",
-                               minutos="Cuantos minutos has estudiado?")
+@tree.command(name="estudio", description="Registra tu tiempo de estudio hoy")
+@discord.app_commands.describe(horas="Cuantas horas has estudiado?", minutos="Cuantos minutos has estudiado?")
 async def estudio(interaction: discord.Interaction, horas: int, minutos: int):
+    if horas<0 or minutos<0:
+        await interaction.response.send_message("No se puede valores negativos. Para eliminar use /deshacer")
+        return
     db : database.UserData = database.read_json_file(config.JSON_PATH)
     database.increase_value(db, interaction.user.name, 60 * horas + minutos)
     await interaction.response.send_message(
@@ -34,7 +36,6 @@ async def estudio(interaction: discord.Interaction, horas: int, minutos: int):
 
 #FUNCION QUE MODIFICA
 @tree.command(name="reset", description="PELIGRO: Reinicia todas tus estadísticas")
-@discord.app_commands.describe()
 async def reset(interaction: discord.Interaction):
     db : database.UserData = database.read_json_file(config.JSON_PATH)
     database.delete_user(db,interaction.user.name)
@@ -42,8 +43,16 @@ async def reset(interaction: discord.Interaction):
         f"{interaction.user.display_name} ahora tiene 0 horas de estudio")
     database.write_json_file(config.JSON_PATH,db)
 
+#FUNCION QUE MODIFICA
+@tree.command(name="deshacer", description="Borra tus estadísticas de hoy")
+async def borrar(interaction: discord.Interaction):
+    db : database.UserData = database.read_json_file(config.JSON_PATH)
+    database.delete_day(db,interaction.user.name)
+    await interaction.response.send_message(
+        f"{interaction.user.display_name} ahora tiene 0 horas de estudio hoy")
+    database.write_json_file(config.JSON_PATH,db)
+
 @tree.command(name="total", description="Muestra el total de horas que has estudiado")
-@discord.app_commands.describe()
 async def total(interaction: discord.Interaction):
     db : database.UserData = database.read_json_file(config.JSON_PATH)
     horas = database.total_value(db,interaction.user.name) // 60
@@ -53,7 +62,6 @@ async def total(interaction: discord.Interaction):
     )
 
 @tree.command(name="estadisticas", description="Muestra tus horas de estudio por día")
-@discord.app_commands.describe()
 async def estadisticas(interaction: discord.Interaction):
     db : database.UserData = database.read_json_file(config.JSON_PATH)
     await interaction.response.send_message(
@@ -69,10 +77,10 @@ async def mensualidad(interaction: discord.Interaction, ano: int, mes: int):
     await interaction.response.send_message(mensaje)
 
 @tree.command(name="podio", description="Grafica top estudios")
-async def top_study_time(ctx):
+async def top_study_time(interaction: discord.Interaction):
     db : database.UserData = database.read_json_file(config.JSON_PATH)
     graphics.generate_leaderboard(db,"leaderboard.png")
-    await ctx.response.send_message(file=discord.File('leaderboard.png'))
+    await interaction.response.send_message(file=discord.File("leaderboard.png"))
 
 
 keepAlive()

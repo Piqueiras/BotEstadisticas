@@ -54,3 +54,7 @@ def user_stats(db:UserData,usr:str) -> str:
 
 def delete_user(db:UserData, usr:str) -> None:
     db[usr] = {}
+    
+def delete_day(db:UserData, usr:str) -> None:
+    today = date.today().isoformat()
+    db[usr].pop(today,None)
