@@ -1,5 +1,5 @@
-from typing import Dict
-from datetime import date
+from typing import Dict, Tuple
+from datetime import date, timedelta
 import json
 
 UserData = Dict[str,Dict[date,int]]
@@ -68,3 +68,25 @@ def delete_day(file_path:str, usr:str) -> None:
     today = date.today().isoformat()
     db[usr].pop(today,None)
     write_json_file(file_path,db)
+    
+def consecutive_days(file_path:str, usr:str) -> Tuple[int,str]:
+    db : UserData = read_json_file(file_path)
+    if usr not in db:
+        return None, None
+    
+    #If user has no data for today, return a streak of 0
+    
+    today = date.today()
+    if today.isoformat() not in db[usr] or db[usr][today.isoformat()]<1:
+        return 0, None
+    
+    streak = 1
+    #Now just iterate backwards until we find a date the user has no data on
+    prev_date=today-timedelta(days=1)
+    
+    while prev_date.isoformat() in db[usr] and db[usr][prev_date.isoformat()]>0:
+        prev_date=prev_date-timedelta(days=1)
+        streak+=1
+        
+    return streak,prev_date.isoformat()
+    
