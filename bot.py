@@ -82,6 +82,22 @@ async def top_study_time(interaction: discord.Interaction):
     graphics.generate_leaderboard(db,"leaderboard.png")
     await interaction.response.send_message(file=discord.File("leaderboard.png"))
 
+@tree.command(name="racha",description="Calcula tu racha total")
+async def racha(interaction: discord.Interaction):
+    db : database.UserData = database.read_json_file(config.JSON_PATH)
+    racha, fecha = database.consecutive_days(db,interaction.user.name)
+    if racha is None:
+        await interaction.response.send_message("Mejor estudia, ¿no?")
+        return
+    if racha == 0:
+        await interaction.response.send_message("Hoy no has estudiado: no puedes tener racha!")
+        return
+    if racha == 1:
+        await interaction.response.send_message("Hoy acabas de empezar tu racha")
+        return
+    
+    await interaction.response.send_message(f"Llevas una racha de {racha} desde el dia {fecha}")
+    
 
 keepAlive()
 client.run(config.TOKEN)
