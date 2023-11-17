@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 from datetime import date, timedelta
 import json
 
@@ -89,4 +89,20 @@ def consecutive_days(file_path:str, usr:str) -> Tuple[int,str]:
         streak+=1
         
     return streak,prev_date.isoformat()
+
+def user_yearly_dates(file_path:str, usr:str, year:int, threshold=0) -> Dict[int,List[int]]:
+    db : UserData = read_json_file(file_path)
+    usr_data = db[usr]
+    result:Dict[int,List[int]] ={}
+
+    for date_str, value in usr_data.items():
+        #For some reason decides to turn into string...
+        date_key = date.fromisoformat(date_str)
+        if date_key.year==year and value>threshold:
+            if date_key.month not in result:
+                result[date_key.month] = [date_key.day]
+            else:
+                result[date_key.month].append(date_key.day)
     
+    return result
+                

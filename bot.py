@@ -1,6 +1,7 @@
 import config
 import database
 import graphics
+import highlighter
 
 import discord
 from discord import app_commands
@@ -64,7 +65,6 @@ async def estadisticas(interaction: discord.Interaction):
 @discord.app_commands.describe(ano="Año", mes="Mes (en número)")
 async def mensualidad(interaction: discord.Interaction, ano: int, mes: int):
     mensaje = database.month_info(config.JSON_PATH,interaction.user.name, ano, mes)
-    print(mensaje)
     await interaction.response.send_message(mensaje)
 
 @tree.command(name="podio", description="Grafica top estudios")
@@ -74,8 +74,7 @@ async def top_study_time(interaction: discord.Interaction):
 
 @tree.command(name="racha",description="Calcula tu racha total")
 async def racha(interaction: discord.Interaction):
-    db : database.UserData = database.read_json_file(config.JSON_PATH)
-    racha, fecha = database.consecutive_days(db,interaction.user.name)
+    racha, fecha = database.consecutive_days(config.JSON_PATH,interaction.user.name)
     if racha is None:
         await interaction.response.send_message("Mejor estudia, ¿no?")
         return
@@ -87,6 +86,17 @@ async def racha(interaction: discord.Interaction):
         return
     
     await interaction.response.send_message(f"Llevas una racha de {racha} desde el dia {fecha}")
+    
+@tree.command(name="calendario",description="Muestra info de los días que has estudiado")
+@discord.app_commands.describe(ano="Año")
+async def calendario(interaction: discord.Interaction, ano: int):
+    await interaction.response.send_message("```ansi\n"+highlighter.year_highlight(ano,
+                                                                             database.user_yearly_dates(config.JSON_PATH,
+                                                                                                        interaction.user.name,
+                                                                                                        ano),
+                                                                             '[2;45m[2;37m',
+                                                                             '[0m[2;45m[0m')+"```")
+    #Lmfao que son estos codigos de color
     
 
 keepAlive()
