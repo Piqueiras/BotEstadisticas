@@ -88,7 +88,7 @@ def consecutive_days(file_path:str, usr:str) -> Tuple[int,str]:
         prev_date=prev_date-timedelta(days=1)
         streak+=1
         
-    return streak,prev_date.isoformat()
+    return streak,(prev_date+timedelta(days=1)).isoformat()
 
 def user_yearly_dates(file_path:str, usr:str, year:int, threshold=0) -> Dict[int,List[int]]:
     db : UserData = read_json_file(file_path)
