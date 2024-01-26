@@ -3,6 +3,7 @@ from typing import Dict
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from collections import defaultdict
 from datetime import datetime
 
@@ -34,4 +35,12 @@ def generate_leaderboard(file_path:str,image_path:str):
 
     # Create a stacked bar plot using Plotly Express
     fig = px.bar(df, x='Username', y=list(df.columns[1:]), title='Monthly Study Hours Leaderboard', labels={'value': 'Study Hours'}, barmode='relative')
+    fig.write_image(image_path,width=1200)
+
+def user_graph(usr:str,file_path:str,image_path:str):
+    db:database.UserData = database.read_json_file(file_path)
+    
+    df = pd.DataFrame(zip(db[usr].keys(), db[usr].values()), columns=["LABEL", "VALUE"])
+    
+    fig = px.bar(df, x="LABEL", y="VALUE", title="Dias", orientation="v")
     fig.write_image(image_path,width=1200)
