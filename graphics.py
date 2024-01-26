@@ -6,7 +6,8 @@ import plotly.express as px
 from collections import defaultdict
 from datetime import datetime
 
-def generate_leaderboard(db:database.UserData,image_path:str):
+def generate_leaderboard(file_path:str,image_path:str):
+    db:database.UserData = database.read_json_file(file_path)
     # Create a dictionary to store the total study time for each user and month
     monthly_user_times = defaultdict(lambda: defaultdict(int))
 
@@ -18,9 +19,16 @@ def generate_leaderboard(db:database.UserData,image_path:str):
 
     # Create a list of dictionaries for Plotly
     data_list = []
-    for username, month_data in monthly_user_times.items():
-        data_list.append({'Username': username, **month_data})
 
+    # Sort
+    while monthly_user_times.__len__()>0:
+        max = list(monthly_user_times.keys())[0]
+        for username in monthly_user_times.keys():
+            if sum(monthly_user_times[username].values()) > sum(monthly_user_times[max].values()):
+                max = username
+        data_list.append({'Username': max, **monthly_user_times[max]})
+        del monthly_user_times[max]
+    
     # Create a DataFrame from the list of dictionaries
     df = pd.DataFrame(data_list)
 
