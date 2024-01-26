@@ -71,6 +71,11 @@ async def mensualidad(interaction: discord.Interaction, ano: int, mes: int):
 async def top_study_time(interaction: discord.Interaction):
     graphics.generate_leaderboard(config.JSON_PATH,"leaderboard.png")
     await interaction.response.send_message(file=discord.File("leaderboard.png"))
+    
+@tree.command(name="grafico", description="Grafico estudio por dia")
+async def grafico(interaction: discord.Interaction):
+    graphics.user_graph(interaction.user.name,config.JSON_PATH,interaction.user.name+".png")
+    await interaction.response.send_message(file=discord.File(interaction.user.name+".png"))
 
 @tree.command(name="racha",description="Calcula tu racha total")
 async def racha(interaction: discord.Interaction):
