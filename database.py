@@ -16,15 +16,16 @@ def write_json_file(file_path:str, db:UserData) -> None:
     with open(file_path, 'w') as file:
         json.dump(db, file, indent=4)
         
-def increase_value(file_path:str, usr:str, value:int) -> None:
+def increase_value(file_path:str, usr:str, value:int, day=None) -> None:
     db : UserData = read_json_file(file_path)
-    today = date.today().isoformat()
+    if day == None:
+        day = date.today().isoformat()
     if usr not in db:
         db[usr] = {}  #If user is new, create new dict
-    if today not in db[usr]:
-        db[usr][today] = value  #If user had no entry for today, create one
+    if day not in db[usr]:
+        db[usr][day] = value  #If user had no entry for day, create one
     else:
-        db[usr][today] += value
+        db[usr][day] += value
     write_json_file(file_path,db)
         
 def total_value(file_path:str, usr:str) -> int:
